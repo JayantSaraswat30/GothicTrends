@@ -34,6 +34,6 @@ export async function GET() {
   return NextResponse.redirect(
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000/"
-      : "https://retro-weebs.vercel.app/"
+      : "https://gothic-trends-pa0giu4yg-kishan-sonagaras-projects.vercel.app/"
   );
 }
