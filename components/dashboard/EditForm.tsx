@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronLeft, XIcon } from "lucide-react";
+import { ChevronLeft, PlusIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { SubmitButton } from "../SubmitButtons";
 import { Switch } from "@/components/ui/switch";
@@ -44,11 +44,13 @@ interface iAppProps {
     images: string[];
     category: $Enums.Category;
     isFeatured: boolean;
+    sizes: { id: string; name: string; stock: number }[];
   };
 }
 
 export function EditForm({ data }: iAppProps) {
   const [images, setImages] = useState<string[]>(data.images);
+  const [sizes, setSizes] = useState(data.sizes);
   const [lastResult, action] = useFormState(editProduct, undefined);
   const [form, fields] = useForm({
     lastResult,
@@ -64,6 +66,21 @@ export function EditForm({ data }: iAppProps) {
   const handleDelete = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
   };
+
+  const handleAddSize = () => {
+    setSizes([...sizes, { id: "", name: "", stock: 0 }]);
+  };
+
+  const handleRemoveSize = (index: number) => {
+    setSizes(sizes.filter((_, i) => i !== index));
+  };
+
+  const handleSizeChange = (index: number, field: string, value: string) => {
+    const newSizes = [...sizes];
+    newSizes[index] = { ...newSizes[index], [field]: value };
+    setSizes(newSizes);
+  };
+
   return (
     <form id={form.id} onSubmit={form.onSubmit} action={action}>
       <input type="hidden" name="productId" value={data.id} />
@@ -169,6 +186,35 @@ export function EditForm({ data }: iAppProps) {
                 </SelectContent>
               </Select>
               <p className="text-red-500">{fields.category.errors}</p>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <Label>Sizes</Label>
+              {sizes.map((size, index) => (
+                <div key={index} className="flex gap-2 items-center">
+                  <Input
+                    type="text"
+                    placeholder="Size name"
+                    value={size.name}
+                    onChange={(e) => handleSizeChange(index, "name", e.target.value)}
+                    name={`sizes[${index}].name`}
+                  />
+                  <Input
+                    type="number"
+                    placeholder="Stock"
+                    value={size.stock}
+                    onChange={(e) => handleSizeChange(index, "stock", e.target.value)}
+                    name={`sizes[${index}].stock`}
+                  />
+                  <Button type="button" variant="outline" size="icon" onClick={() => handleRemoveSize(index)}>
+                    <XIcon className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+              <Button type="button" variant="outline" onClick={handleAddSize}>
+                <PlusIcon className="w-4 h-4 mr-2" /> Add Size
+              </Button>
+              <p className="text-red-500">{fields.sizes.errors}</p>
             </div>
 
             <div className="flex flex-col gap-3">

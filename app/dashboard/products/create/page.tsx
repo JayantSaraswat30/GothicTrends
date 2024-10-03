@@ -21,7 +21,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadDropzone } from "@/lib/uploadthing";
-import { ChevronLeft, XIcon } from "lucide-react";
+import { ChevronLeft, PlusIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useFormState } from "react-dom";
@@ -34,6 +34,7 @@ import { SubmitButton } from "@/components/SubmitButtons";
 
 const Page = () => {
   const [images, setImages] = useState<string[]>([]);
+  const [sizes, setSizes] = useState([{ name: "", stock: 0 }]);
   const [lastResult, action] = useFormState(createProduct, undefined);
   const [form, fields] = useForm({
     lastResult,
@@ -45,8 +46,23 @@ const Page = () => {
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
   });
+
   const handleDelete = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
+  };
+
+  const handleAddSize = () => {
+    setSizes([...sizes, { name: "", stock: 0 }]);
+  };
+
+  const handleRemoveSize = (index: number) => {
+    setSizes(sizes.filter((_, i) => i !== index));
+  };
+
+  const handleSizeChange = (index: number, field: string, value: string) => {
+    const newSizes = [...sizes];
+    newSizes[index] = { ...newSizes[index], [field]: value };
+    setSizes(newSizes);
   };
   return (
     <form id={form.id} onSubmit={form.onSubmit} action={action}>
@@ -130,6 +146,43 @@ const Page = () => {
               <p className="text-red-500">{fields.status.errors}</p>
             </div>
 
+            <div className="flex flex-col gap-3">
+              <Label>Sizes</Label>
+              {sizes.map((size, index) => (
+                <div key={index} className="flex gap-2 items-center">
+                  <Input
+                    type="text"
+                    placeholder="Size name"
+                    value={size.name}
+                    onChange={(e) =>
+                      handleSizeChange(index, "name", e.target.value)
+                    }
+                    name={`sizes[${index}].name`}
+                  />
+                  <Input
+                    type="number"
+                    placeholder="Stock"
+                    value={size.stock}
+                    onChange={(e) =>
+                      handleSizeChange(index, "stock", e.target.value)
+                    }
+                    name={`sizes[${index}].stock`}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleRemoveSize(index)}
+                  >
+                    <XIcon className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+              <Button type="button" variant="outline" onClick={handleAddSize}>
+                <PlusIcon className="w-4 h-4 mr-2" /> Add Size
+              </Button>
+              <p className="text-red-500">{fields.sizes.errors}</p>
+            </div>
             <div className="flex flex-col gap-3">
               <Label>Category</Label>
               <Select

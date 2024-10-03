@@ -6,25 +6,6 @@ import { ProductCard } from "@/components/storefront/ProductCard";
 
 async function getData(productCategory: string) {
   switch (productCategory) {
-    case "all": {
-      const data = await prisma.product.findMany({
-        select: {
-          name: true,
-          images: true,
-          price: true,
-          id: true,
-          description: true,
-        },
-        where: {
-          status: "published",
-        },
-      });
-
-      return {
-        title: "All Products",
-        data: data,
-      };
-    }
     case "men": {
       const data = await prisma.product.findMany({
         where: {

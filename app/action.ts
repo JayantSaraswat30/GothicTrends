@@ -6,7 +6,6 @@ import { bannerSchema, productSchema } from "@/lib/zodSchemas";
 import prisma from "@/lib/db";
 import { redis } from "@/lib/redis";
 import { revalidatePath } from "next/cache";
-import { Cart } from "@/lib/interface";
 import { stripe } from "@/lib/stripe";
 import Stripe from "stripe";
 import { adminUsers } from "./constants";
@@ -37,9 +36,15 @@ export async function createProduct(prevState: unknown, formData: FormData) {
       price: submission.value.price,
       images: flattenUrls,
       category: submission.value.category,
-      isFeatured: submission.value.isFeatured
-    }
-  })
+      isFeatured: submission.value.isFeatured,
+      sizes: {
+        create: submission.value.sizes.map((size) => ({
+          name: size.name,
+          stock: size.stock,
+        })),
+      },
+    },
+  });
 
   redirect('/dashboard/products')
 }
@@ -65,6 +70,15 @@ export async function editProduct(prevState: any, formData: FormData) {
   );
 
   const productId = formData.get("productId") as string;
+  
+  // First, delete existing sizes
+  await prisma.size.deleteMany({
+    where: {
+      productId: productId,
+    },
+  });
+
+  // Then update the product and create new sizes
   await prisma.product.update({
     where: {
       id: productId,
@@ -77,11 +91,18 @@ export async function editProduct(prevState: any, formData: FormData) {
       isFeatured: submission.value.isFeatured === true ? true : false,
       status: submission.value.status,
       images: flattenUrls,
+      sizes: {
+        create: submission.value.sizes.map((size) => ({
+          name: size.name,
+          stock: size.stock,
+        })),
+      },
     },
   });
 
   redirect("/dashboard/products");
 }
+
 
 export async function deleteProduct(formData: FormData) {
   const { getUser } = getKindeServerSession();
@@ -143,13 +164,17 @@ export async function deleteBanner(formData: FormData) {
   redirect("/dashboard/banner");
 }
 
-export async function addItem(productId: string) {
+export async function addItem(formData: FormData) {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
   if (!user) {
     return redirect("/");
   }
+
+  const productId = formData.get("productId") as string;
+  const sizeId = formData.get("sizeId") as string;
+  const quantity = parseInt(formData.get("quantity") as string) || 1;
 
   let cart: Cart | null = await redis.get(`cart-${user.id}`);
 
@@ -159,39 +184,48 @@ export async function addItem(productId: string) {
       name: true,
       price: true,
       images: true,
+      sizes: {
+        where: {
+          id: sizeId
+        }
+      }
     },
     where: {
       id: productId,
     },
   });
 
-  if (!selectedProduct) {
-    throw new Error("No product with this id");
+  if (!selectedProduct || selectedProduct.sizes.length === 0) {
+    throw new Error("No product with this id or size");
   }
-  let myCart = {} as Cart;
+
+  const selectedSize = selectedProduct.sizes[0];
+
+  let myCart: Cart = {
+    userId: user.id,
+    items: [],
+  };
 
   if (!cart || !cart.items) {
-    myCart = {
-      userId: user.id,
-      items: [
-        {
-          price: selectedProduct.price,
-          id: selectedProduct.id,
-          imageString: selectedProduct.images[0],
-          name: selectedProduct.name,
-          quantity: 1,
-        },
-      ],
-    };
+    myCart.items = [
+      {
+        price: selectedProduct.price,
+        id: selectedProduct.id,
+        imageString: selectedProduct.images[0],
+        name: selectedProduct.name,
+        quantity: quantity,
+        sizeId: selectedSize.id,
+        sizeName: selectedSize.name,
+      },
+    ];
   } else {
     let itemFound = false;
 
-    myCart.items = cart.items.map((item) => {
-      if (item.id === productId) {
+    myCart.items = cart.items.map((item: any) => {
+      if (item.id === productId && item.sizeId === sizeId) {
         itemFound = true;
-        item.quantity += 1;
+        return { ...item, quantity: item.quantity + quantity };
       }
-
       return item;
     });
 
@@ -201,7 +235,9 @@ export async function addItem(productId: string) {
         imageString: selectedProduct.images[0],
         name: selectedProduct.name,
         price: selectedProduct.price,
-        quantity: 1,
+        quantity: quantity,
+        sizeId: selectedSize.id,
+        sizeName: selectedSize.name,
       });
     }
   }
@@ -210,7 +246,6 @@ export async function addItem(productId: string) {
 
   revalidatePath("/", "layout");
 }
-
 export async function delItem(formData: FormData) {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
@@ -254,7 +289,8 @@ export async function CheckOut() {
           unit_amount: item.price * 100,
           product_data: {
             name: item.name,
-            images: [item.imageString]
+            images: [item.imageString],
+            description: `Size: ${item.sizeName}`,
           }
         },
         quantity: item.quantity
@@ -273,4 +309,62 @@ export async function CheckOut() {
 
     return redirect(session.url as string)
   }
+}
+
+export async function searchProducts(query: string) {
+  const products = await prisma.product.findMany({
+    where: {
+      OR: [
+        { name: { contains: query, mode: 'insensitive' } },
+        { description: { contains: query, mode: 'insensitive' } },
+      ],
+      status: 'published',
+    },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      images: true,
+    },
+    take: 5, // Limit to 5 results
+  });
+
+  return products;
+}
+
+export async function updateQuantity(formData: FormData) {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+
+  if (!user) {
+    return redirect("/");
+  }
+
+  const productId = formData.get("productId") as string;
+  const sizeId = formData.get("sizeId") as string;
+  const action = formData.get("action") as "increment" | "decrement";
+
+  let cart: Cart | null = await redis.get(`cart-${user.id}`);
+
+  if (!cart || !cart.items) {
+    return;
+  }
+
+  const updatedItems = cart.items.map((item) => {
+    if (item.id === productId && item.sizeId === sizeId) {
+      return {
+        ...item,
+        quantity: action === "increment" ? item.quantity + 1 : Math.max(1, item.quantity - 1),
+      };
+    }
+    return item;
+  });
+
+  const updatedCart: Cart = {
+    userId: user.id,
+    items: updatedItems,
+  };
+
+  await redis.set(`cart-${user.id}`, updatedCart);
+  revalidatePath("/bag");
 }

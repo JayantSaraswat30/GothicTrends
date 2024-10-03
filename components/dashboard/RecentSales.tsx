@@ -7,7 +7,7 @@ async function getData() {
     select: {
       amount: true,
       id: true,
-      User: {
+      user: {
         select: {
           firstName: true,
           profileImage: true,
@@ -35,15 +35,15 @@ export async function RecentSales() {
         {data.map((item) => (
           <div className="flex items-center gap-4" key={item.id}>
             <Avatar className="hidden sm:flex h-9 w-9">
-              <AvatarImage src={item.User?.profileImage} alt="Avatar Image" />
+              <AvatarImage src={item.user?.profileImage} alt="Avatar Image" />
               <AvatarFallback>
-                {item.User?.firstName.slice(0, 3)}
+                {item.user?.firstName.slice(0, 3)}
               </AvatarFallback>
             </Avatar>
             <div className="grid gap-1">
-              <p className="text-sm font-medium">{item.User?.firstName}</p>
+              <p className="text-sm font-medium">{item.user?.firstName}</p>
               <p className="text-sm text-muted-foreground">
-                {item.User?.email}
+                {item.user?.email}
               </p>
             </div>
             <p className="ml-auto font-medium">

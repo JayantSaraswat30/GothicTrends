@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,15 +11,13 @@ datasource db {
 }
 
 model User {
-  id           String @id @unique
+  id           String   @id @unique
   email        String
   firstName    String
   lastName     String
   profileImage String
-
-  order Order[]
-
-  createdAt DateTime @default(now())
+  order        Order[]
+  createdAt    DateTime @default(now())
 }
 
 model Product {
@@ -34,27 +29,46 @@ model Product {
   images      String[]
   category    Category
   isFeatured  Boolean       @default(false)
+  sizes       Size[]
+  createdAt   DateTime      @default(now())
+  orderItems  OrderItem[]
+}
 
-  createdAt DateTime @default(now())
+model Size {
+  id        String      @id @default(uuid())
+  name      String
+  stock     Int
+  product   Product     @relation(fields: [productId], references: [id])
+  productId String
+  orderItems OrderItem[]
 }
 
 model Banner {
-  id          String @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
   imageString String
-
-  createdAt DateTime @default(now())
+  createdAt   DateTime @default(now())
 }
 
 model Order {
-  id     String @id @default(uuid())
-  status String @default("pending")
-  amount Int
+  id        String      @id @default(uuid())
+  status    String      @default("pending")
+  amount    Int
+  user      User?       @relation(fields: [userId], references: [id])
+  userId    String?
+  orderItems OrderItem[]
+  createdAt DateTime    @default(now())
+}
 
-  User   User?   @relation(fields: [userId], references: [id])
-  userId String?
-
-  createdAt DateTime @default(now())
+model OrderItem {
+  id        String   @id @default(uuid())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  size      Size     @relation(fields: [sizeId], references: [id])
+  sizeId    String
+  quantity  Int
 }
 
 enum ProductStatus {

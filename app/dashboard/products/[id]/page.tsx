@@ -9,6 +9,9 @@ async function getData(productId: string) {
     where: {
       id: productId,
     },
+    include: {
+      sizes: true, // Include the sizes relation
+    },
   });
 
   if (!data) {
@@ -17,7 +20,6 @@ async function getData(productId: string) {
 
   return data;
 }
-
 export default async function EditRoute({
   params,
 }: {

@@ -1,86 +1,59 @@
-import prisma from "@/lib/db";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { unstable_noStore as noStore } from "next/cache";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import prisma from "@/lib/db"
+import { unstable_noStore as noStore } from "next/cache"
+import { ClientOrders } from "./_components/ClientOrders"
 
 async function getData() {
-  const data = await prisma.order.findMany({
+  noStore()
+  const orders = await prisma.order.findMany({
     select: {
       amount: true,
       createdAt: true,
       status: true,
       id: true,
-      User: {
+      user: {
         select: {
           firstName: true,
           email: true,
-          profileImage: true,
+        },
+      },
+      orderItems: {
+        select: {
+          quantity: true,
+          product: {
+            select: {
+              name: true,
+              category: true,
+            },
+          },
+          size: {
+            select: {
+              name: true,
+            },
+          },
         },
       },
     },
     orderBy: {
-      createdAt: "desc",
+      createdAt: 'desc',
     },
-  });
+  })
 
-  return data;
+  return orders
 }
 
 export default async function OrdersPage() {
-  noStore();
-  const data = await getData();
+  const orders = await getData()
+
   return (
     <Card>
-      <CardHeader className="px-7">
+      <CardHeader>
         <CardTitle>Orders</CardTitle>
-        <CardDescription>Recent orders from your store!</CardDescription>
+        <CardDescription>Manage your store orders</CardDescription>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Customer</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>
-                  <p className="font-medium">{item.User?.firstName}</p>
-                  <p className="hidden md:flex text-sm text-muted-foreground">
-                    {item.User?.email}
-                  </p>
-                </TableCell>
-                <TableCell>Order</TableCell>
-                <TableCell>{item.status}</TableCell>
-                <TableCell>
-                  {new Intl.DateTimeFormat("en-US").format(item.createdAt)}
-                </TableCell>
-                <TableCell className="text-right">
-                  ${new Intl.NumberFormat("en-US").format(item.amount / 100)}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <ClientOrders initialOrders={orders} />
       </CardContent>
     </Card>
-  );
+  )
 }

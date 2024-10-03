@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface iAppProps {
   images: string[];
@@ -12,6 +12,9 @@ interface iAppProps {
 
 export function ImageSlider({ images }: iAppProps) {
   const [mainImageIndex, setMainImageIndex] = useState(0);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const imageRef = useRef<HTMLDivElement>(null);
 
   function handlePreviousClick() {
     setMainImageIndex((prevIndex) =>
@@ -29,15 +32,46 @@ export function ImageSlider({ images }: iAppProps) {
     setMainImageIndex(index);
   }
 
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (!imageRef.current) return;
+
+    const { left, top, width, height } = imageRef.current.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+
+    setZoomPosition({ x, y });
+  }
+
+  function handleMouseEnter() {
+    setIsZoomed(true);
+  }
+
+  function handleMouseLeave() {
+    setIsZoomed(false);
+  }
+
   return (
     <div className="grid gap-6 md:gap-3 items-start">
-      <div className="relative overflow-hidden rounded-lg">
+      <div 
+        className="relative overflow-hidden rounded-lg"
+        style={{ width: '600px', height: '600px' }}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        ref={imageRef}
+      >
         <Image
           width={600}
           height={600}
           src={images[mainImageIndex]}
           alt="Product image"
-          className="object-cover w-[600px] h-[600px]"
+          className={cn(
+            "object-cover w-full h-full transition-transform duration-200 ease-out",
+            isZoomed ? "scale-150" : "scale-100"
+          )}
+          style={{
+            transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
+          }}
         />
 
         <div className="absolute inset-0 flex items-center justify-between px-4">
