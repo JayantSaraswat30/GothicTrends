@@ -1,7 +1,7 @@
 "use server"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";
-import { parseWithZod } from "@conform-to/zod"
+import { parseWithZod } from "@conform-to/zod";
 import { bannerSchema, productSchema } from "@/lib/zodSchemas";
 import prisma from "@/lib/db";
 import { redis } from "@/lib/redis";
@@ -22,11 +22,13 @@ export async function createProduct(prevState: unknown, formData: FormData) {
     schema: productSchema,
   });
 
-  if(submission.status !== "success") {
+  if (submission.status !== "success") {
     return submission.reply();
   }
 
-  const flattenUrls = submission.value.images.flatMap((urlString) => urlString.split(",").map((url) => url.trim()))
+  const flattenUrls = submission.value.images.flatMap((urlString) =>
+    urlString.split(",").map((url) => url.trim())
+  );
 
   await prisma.product.create({
     data: {
@@ -46,7 +48,7 @@ export async function createProduct(prevState: unknown, formData: FormData) {
     },
   });
 
-  redirect('/dashboard/products')
+  return redirect("/dashboard/products");
 }
 
 export async function editProduct(prevState: any, formData: FormData) {
@@ -70,7 +72,7 @@ export async function editProduct(prevState: any, formData: FormData) {
   );
 
   const productId = formData.get("productId") as string;
-  
+
   // First, delete existing sizes
   await prisma.size.deleteMany({
     where: {
@@ -100,25 +102,67 @@ export async function editProduct(prevState: any, formData: FormData) {
     },
   });
 
-  redirect("/dashboard/products");
+  return redirect("/dashboard/products");
 }
-
 
 export async function deleteProduct(formData: FormData) {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
   if (!user || !adminUsers.includes(user.email as string)) {
+    console.log("Unauthorized access attempt");
     return redirect("/");
   }
 
-  await prisma.product.delete({
-    where: {
-      id: formData.get("productId") as string,
-    },
-  });
+  const productId = formData.get("productId") as string;
+  console.log(`Attempting to delete product with ID: ${productId}`);
 
-  redirect("/dashboard/products");
+  try {
+    const result = await prisma.$transaction(async (prisma) => {
+      // Check if the product exists
+      const product = await prisma.product.findUnique({
+        where: { id: productId },
+        include: { sizes: true }
+      });
+
+      if (!product) {
+        console.log(`Product with ID ${productId} not found`);
+        throw new Error("Product not found");
+      }
+
+      console.log(`Found product: ${product.name} with ${product.sizes.length} sizes`);
+
+      // Delete all related OrderItem records
+      const { count: deletedOrderItemsCount } = await prisma.orderItem.deleteMany({
+        where: { 
+          size: {
+            productId: productId
+          }
+        },
+      });
+      console.log(`Deleted ${deletedOrderItemsCount} order item records`);
+
+      // Delete all related Size records
+      const { count: deletedSizesCount } = await prisma.size.deleteMany({
+        where: { productId: productId },
+      });
+      console.log(`Deleted ${deletedSizesCount} size records`);
+
+      // Delete the product
+      const deletedProduct = await prisma.product.delete({
+        where: { id: productId },
+      });
+      console.log(`Deleted product: ${deletedProduct.name}`);
+
+      return deletedProduct;
+    });
+
+    console.log(`Successfully deleted product: ${result.name}`);
+    return redirect("/dashboard/products");
+  } catch (error) {
+    console.error("Error in deleteProduct function:", error);
+    throw error;
+  }
 }
 
 export async function createBanner(prevState: any, formData: FormData) {
@@ -144,7 +188,7 @@ export async function createBanner(prevState: any, formData: FormData) {
     },
   });
 
-  redirect("/dashboard/banner");
+  return redirect("/dashboard/banner");
 }
 
 export async function deleteBanner(formData: FormData) {
@@ -161,7 +205,7 @@ export async function deleteBanner(formData: FormData) {
     },
   });
 
-  redirect("/dashboard/banner");
+  return redirect("/dashboard/banner");
 }
 
 export async function addItem(formData: FormData) {
@@ -186,9 +230,9 @@ export async function addItem(formData: FormData) {
       images: true,
       sizes: {
         where: {
-          id: sizeId
-        }
-      }
+          id: sizeId,
+        },
+      },
     },
     where: {
       id: productId,
@@ -244,8 +288,9 @@ export async function addItem(formData: FormData) {
 
   await redis.set(`cart-${user.id}`, myCart);
 
-  revalidatePath("/", "layout");
+  return revalidatePath("/", "layout");
 }
+
 export async function delItem(formData: FormData) {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
@@ -267,47 +312,50 @@ export async function delItem(formData: FormData) {
     await redis.set(`cart-${user.id}`, updateCart);
   }
 
-  revalidatePath("/bag");
+  return revalidatePath("/bag");
 }
 
 export async function CheckOut() {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
-  if(!user) {
-    return redirect("/")
+  if (!user) {
+    return redirect("/");
   }
 
   let cart: Cart | null = await redis.get(`cart-${user.id}`);
 
-  if(cart && cart.items) {
-
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = cart.items.map((item) => (
-      {
-        price_data: {
-          currency: 'usd',
-          unit_amount: item.price * 100,
-          product_data: {
-            name: item.name,
-            images: [item.imageString],
-            description: `Size: ${item.sizeName}`,
-          }
+  if (cart && cart.items) {
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = cart.items.map((item) => ({
+      price_data: {
+        currency: "usd",
+        unit_amount: item.price * 100,
+        product_data: {
+          name: item.name,
+          images: [item.imageString],
+          description: `Size: ${item.sizeName}`,
         },
-        quantity: item.quantity
-      }
-    ))
+      },
+      quantity: item.quantity,
+    }));
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: lineItems,
-      success_url:process.env.NODE_ENV === "development" ? "http://localhost:3000/payment/success" : "https://gothic-trends-pa0giu4yg-kishan-sonagaras-projects.vercel.app/payment/success",
-      cancel_url:process.env.NODE_ENV === "development" ?  "http://localhost:3000/payment/cancel" : "https://gothic-trends-pa0giu4yg-kishan-sonagaras-projects.vercel.app/payment/cancel",
+      success_url:
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:3000/payment/success"
+          : "https://gothic-trends-pa0giu4yg-kishan-sonagaras-projects.vercel.app/payment/success",
+      cancel_url:
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:3000/payment/cancel"
+          : "https://gothic-trends-pa0giu4yg-kishan-sonagaras-projects.vercel.app/payment/cancel",
       metadata: {
-        userId: user.id
-      }
-    })
+        userId: user.id,
+      },
+    });
 
-    return redirect(session.url as string)
+    return redirect(session.url as string);
   }
 }
 
@@ -315,10 +363,10 @@ export async function searchProducts(query: string) {
   const products = await prisma.product.findMany({
     where: {
       OR: [
-        { name: { contains: query, mode: 'insensitive' } },
-        { description: { contains: query, mode: 'insensitive' } },
+        { name: { contains: query, mode: "insensitive" } },
+        { description: { contains: query, mode: "insensitive" } },
       ],
-      status: 'published',
+      status: "published",
     },
     select: {
       id: true,
@@ -366,5 +414,5 @@ export async function updateQuantity(formData: FormData) {
   };
 
   await redis.set(`cart-${user.id}`, updatedCart);
-  revalidatePath("/bag");
+  return revalidatePath("/bag");
 }
