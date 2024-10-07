@@ -29,7 +29,7 @@ export function CategoriesSelection() {
           />
           <div className="bg-gradient-to-b from-transparent to-black opacity-55" />
           <div className="p-6 flex items-end">
-            <Link href="/products/all">
+            <Link href="/products">
               <h3 className="text-white font-semibold">All Products</h3>
               <p className="mt-1 text-sm text-white">Shop Now</p>
             </Link>
