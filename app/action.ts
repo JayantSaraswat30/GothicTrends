@@ -346,11 +346,11 @@ export async function CheckOut() {
       success_url:
         process.env.NODE_ENV === "development"
           ? "http://localhost:3000/payment/success"
-          : "https://gothic-trends-pa0giu4yg-kishan-sonagaras-projects.vercel.app/payment/success",
+          : "https://gothic-trends.vercel.app/payment/success",
       cancel_url:
         process.env.NODE_ENV === "development"
           ? "http://localhost:3000/payment/cancel"
-          : "https://gothic-trends-pa0giu4yg-kishan-sonagaras-projects.vercel.app/payment/cancel",
+          : "https://gothic-trends.vercel.app/payment/cancel",
       metadata: {
         userId: user.id,
       },
