@@ -3,6 +3,7 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { ShoppingBag, Plus, Minus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Cart } from '@/lib/interface'; // adjust path as needed
 import { unstable_noStore as noStore } from "next/cache";
 import { redirect } from "next/navigation";
 import { redis } from "@/lib/redis";
