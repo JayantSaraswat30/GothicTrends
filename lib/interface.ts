@@ -1,4 +1,4 @@
-interface CartItem {
+export interface CartItem {
   id: string;
   name: string;
   price: number;
@@ -8,7 +8,7 @@ interface CartItem {
   sizeName: string;
 }
 
-interface Cart {
+export interface Cart {
   userId: string;
   items: CartItem[];
 }
