@@ -9,6 +9,7 @@ import { revalidatePath } from "next/cache";
 import { stripe } from "@/lib/stripe";
 import Stripe from "stripe";
 import { adminUsers } from "./constants";
+import {Cart} from "@/lib/interface";
 
 export async function createProduct(prevState: unknown, formData: FormData) {
   const { getUser } = getKindeServerSession();
