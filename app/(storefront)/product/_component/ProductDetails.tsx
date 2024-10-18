@@ -40,51 +40,84 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start lg:gap-x-24 py-6">
-      <ImageSlider images={product.images} />
-      <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
-          {product.name}
-        </h1>
-        <p className="text-3xl mt-2 text-gray-900">${product.price}</p>
-        <div className="mt-3 flex items-center gap-1">
-          {[...Array(5)].map((_, index) => (
-            <StarIcon key={index} className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-          ))}
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start lg:gap-x-24 py-4 md:py-6">
+        {/* Image Slider Section */}
+        <div className="w-full max-w-2xl mx-auto">
+          <ImageSlider images={product.images} />
         </div>
-        <p className="text-base text-gray-700 mt-6">{product.description}</p>
-        
-        <form action={handleAddToCart}>
-          <input type="hidden" name="productId" value={product.id} />
-          <div className="mt-6">
-            <label htmlFor="size" className="block text-sm font-medium text-gray-700">
-              Size
-            </label>
-            <Select name="sizeId">
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a size" />
-              </SelectTrigger>
-              <SelectContent>
-                {product.sizes.map((size) => (
-                  <SelectItem key={size.id} value={size.id}>
-                    {size.name} {size.stock > 0 ? `(${size.stock} in stock)` : "(Out of stock)"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+
+        {/* Product Details Section */}
+        <div className="w-full max-w-xl mx-auto md:max-w-none space-y-4 md:space-y-6">
+          <div className="space-y-2">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900 break-words">
+              {product.name}
+            </h1>
+            <p className="text-2xl sm:text-3xl text-gray-900">${product.price}</p>
+            <div className="flex items-center gap-1">
+              {[...Array(5)].map((_, index) => (
+                <StarIcon 
+                  key={index} 
+                  className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-500 fill-yellow-500" 
+                />
+              ))}
+            </div>
           </div>
-          <div className="mt-6 flex items-center">
-            <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mr-4">
-              Quantity
-            </label>
-            <Button type="button" onClick={decrementQuantity} className="px-2 py-1">-</Button>
-            <span className="mx-4">{quantity}</span>
-            <Button type="button" onClick={incrementQuantity} className="px-2 py-1">+</Button>
-          </div>
-          <div className="mt-6">
-            <ShoppingBagButton />
-          </div>
-        </form>
+
+          <p className="text-sm sm:text-base text-gray-700">{product.description}</p>
+          
+          <form action={handleAddToCart} className="space-y-4 md:space-y-6">
+            <input type="hidden" name="productId" value={product.id} />
+            
+            {/* Size Selection */}
+            <div className="space-y-2">
+              <label htmlFor="size" className="block text-sm font-medium text-gray-700">
+                Size
+              </label>
+              <Select name="sizeId">
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a size" />
+                </SelectTrigger>
+                <SelectContent>
+                  {product.sizes.map((size) => (
+                    <SelectItem key={size.id} value={size.id}>
+                      {size.name} {size.stock > 0 ? `(${size.stock} in stock)` : "(Out of stock)"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Quantity Selection */}
+            <div className="flex items-center space-x-4">
+              <label htmlFor="quantity" className="text-sm font-medium text-gray-700">
+                Quantity
+              </label>
+              <div className="flex items-center">
+                <Button 
+                  type="button" 
+                  onClick={decrementQuantity} 
+                  className="h-8 w-8 sm:h-10 sm:w-10 rounded-full"
+                >
+                  -
+                </Button>
+                <span className="w-12 text-center">{quantity}</span>
+                <Button 
+                  type="button" 
+                  onClick={incrementQuantity} 
+                  className="h-8 w-8 sm:h-10 sm:w-10 rounded-full"
+                >
+                  +
+                </Button>
+              </div>
+            </div>
+
+            {/* Add to Cart Button */}
+            <div className="w-full sm:max-w-md">
+              <ShoppingBagButton />
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
