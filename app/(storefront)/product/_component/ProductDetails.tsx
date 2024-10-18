@@ -1,13 +1,94 @@
 "use client";
 
 import React, { useState } from 'react';
-import { StarIcon } from "lucide-react";
-import { ImageSlider } from "@/components/storefront/ImageSlider";
+import { StarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { addItem } from "@/app/action";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ShoppingBagButton } from "@/components/SubmitButtons";
 
+// ImageSlider Component
+export function ImageSlider({ images }: { images: string[] }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const nextImage = () => {
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const previousImage = () => {
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  return (
+    <div className="relative w-full">
+      {/* Main Image Container */}
+      <div className="relative aspect-square w-full overflow-hidden rounded-lg">
+        {images.map((image, index) => (
+          <div
+            key={index}
+            className={`absolute w-full h-full transition-opacity duration-300 ease-in-out
+              ${index === currentIndex ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <img
+              src={image}
+              alt={`Product image ${index + 1}`}
+              className="h-full w-full object-cover object-center"
+            />
+          </div>
+        ))}
+        
+        {/* Navigation Buttons */}
+        <div className="absolute inset-0 flex items-center justify-between p-4">
+          <button
+            onClick={previousImage}
+            className="rounded-full bg-white/80 p-2 text-gray-800 hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </button>
+          <button
+            onClick={nextImage}
+            className="rounded-full bg-white/80 p-2 text-gray-800 hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+          >
+            <ChevronRight className="h-6 w-6" />
+          </button>
+        </div>
+      </div>
+
+      {/* Thumbnail Navigation */}
+      <div className="mt-4 hidden md:flex gap-4 justify-center">
+        {images.map((image, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`relative h-16 w-16 rounded-lg overflow-hidden 
+              ${index === currentIndex ? 'ring-2 ring-black' : 'ring-1 ring-gray-200'}`}
+          >
+            <img
+              src={image}
+              alt={`Thumbnail ${index + 1}`}
+              className="h-full w-full object-cover object-center"
+            />
+          </button>
+        ))}
+      </div>
+
+      {/* Mobile Dots Navigation */}
+      <div className="mt-4 flex md:hidden justify-center gap-2">
+        {images.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`h-2 w-2 rounded-full ${
+              index === currentIndex ? 'bg-gray-800' : 'bg-gray-300'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ProductDetails Component
 interface ProductDetailsProps {
   product: {
     id: string;
@@ -41,14 +122,14 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start lg:gap-x-24 py-4 md:py-6">
-        {/* Image Slider Section */}
-        <div className="w-full max-w-2xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 py-4 md:py-8">
+        {/* Image Section */}
+        <div className="relative w-full md:sticky md:top-20">
           <ImageSlider images={product.images} />
         </div>
 
         {/* Product Details Section */}
-        <div className="w-full max-w-xl mx-auto md:max-w-none space-y-4 md:space-y-6">
+        <div className="w-full space-y-6">
           <div className="space-y-2">
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900 break-words">
               {product.name}
@@ -66,7 +147,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
           <p className="text-sm sm:text-base text-gray-700">{product.description}</p>
           
-          <form action={handleAddToCart} className="space-y-4 md:space-y-6">
+          <form action={handleAddToCart} className="space-y-6">
             <input type="hidden" name="productId" value={product.id} />
             
             {/* Size Selection */}
@@ -93,19 +174,19 @@ export function ProductDetails({ product }: ProductDetailsProps) {
               <label htmlFor="quantity" className="text-sm font-medium text-gray-700">
                 Quantity
               </label>
-              <div className="flex items-center">
+              <div className="flex items-center gap-3">
                 <Button 
                   type="button" 
                   onClick={decrementQuantity} 
-                  className="h-8 w-8 sm:h-10 sm:w-10 rounded-full"
+                  className="h-9 w-9 rounded-full"
                 >
                   -
                 </Button>
-                <span className="w-12 text-center">{quantity}</span>
+                <span className="w-12 text-center text-lg">{quantity}</span>
                 <Button 
                   type="button" 
                   onClick={incrementQuantity} 
-                  className="h-8 w-8 sm:h-10 sm:w-10 rounded-full"
+                  className="h-9 w-9 rounded-full"
                 >
                   +
                 </Button>
@@ -113,7 +194,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             </div>
 
             {/* Add to Cart Button */}
-            <div className="w-full sm:max-w-md">
+            <div className="w-full">
               <ShoppingBagButton />
             </div>
           </form>
