@@ -48,7 +48,7 @@ export default async function DashboardLayout({
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
-            <nav className="flex flex-col gap-6 text-lg font-medium mt-5 hover:text-orange-500">
+            <nav className="flex flex-col gap-6 text-lg font-medium mt-5">
               <DashboardNavigation />
             </nav>
           </SheetContent>
