@@ -75,7 +75,7 @@ export function SearchBar() {
         className="w-full"
       />
       {isLoading && (
-        <div className="absolute top-full left-0 right-0 bg-white shadow-md mt-1 p-2">
+        <div className="absolute top-full left-0 right-0 bg-white  shadow-md mt-1 p-2">
           Loading...
         </div>
       )}

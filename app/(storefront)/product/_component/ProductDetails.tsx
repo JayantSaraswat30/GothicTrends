@@ -50,10 +50,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         {/* Product Details Section */}
         <div className="w-full max-w-xl mx-auto md:max-w-none space-y-4 md:space-y-6">
           <div className="space-y-2">
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900 break-words">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white break-words">
               {product.name}
             </h1>
-            <p className="text-2xl sm:text-3xl text-gray-900">${product.price}</p>
+            <p className="text-2xl sm:text-3xl text-gray-900 dark:text-white">${product.price}</p>
             <div className="flex items-center gap-1">
               {[...Array(5)].map((_, index) => (
                 <StarIcon 
@@ -64,14 +64,14 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             </div>
           </div>
 
-          <p className="text-sm sm:text-base text-gray-700">{product.description}</p>
+          <p className="text-sm sm:text-base text-gray-700 dark:text-white">{product.description}</p>
           
           <form action={handleAddToCart} className="space-y-4 md:space-y-6">
             <input type="hidden" name="productId" value={product.id} />
             
             {/* Size Selection */}
             <div className="space-y-2">
-              <label htmlFor="size" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="size" className="block text-sm font-medium text-gray-700 dark:text-white">
                 Size
               </label>
               <Select name="sizeId">
@@ -90,7 +90,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
             {/* Quantity Selection */}
             <div className="flex items-center space-x-4">
-              <label htmlFor="quantity" className="text-sm font-medium text-gray-700">
+              <label htmlFor="quantity" className="text-sm font-medium text-gray-700 dark:text-white">
                 Quantity
               </label>
               <div className="flex items-center">

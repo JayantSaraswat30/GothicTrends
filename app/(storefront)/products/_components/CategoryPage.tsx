@@ -70,7 +70,7 @@ export default function CategoryPage({ initialProducts }: CategoryPageProps) {
       <h1 className="text-3xl font-bold mb-8">Our Products</h1>
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-1/4">
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white dark:bg-black p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-4">Filters</h2>
             <div className="mb-6">
               <Label htmlFor="search" className="text-lg font-semibold mb-2">Search</Label>

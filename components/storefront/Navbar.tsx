@@ -8,6 +8,8 @@ import { UserDropdown } from "./UserDropdown"
 import { redis } from "@/lib/redis"
 import { Cart } from "@/lib/interface"
 import { SearchBar } from "./SearchBar"
+import { ThemeToggle } from "../dashboard/ThemeToggle"
+
 
 export async function Navbar() {
   const { getUser } = getKindeServerSession()
@@ -17,12 +19,12 @@ export async function Navbar() {
   const total = cart?.items.reduce((sum, item) => sum + item.quantity, 0) || 0
 
   return (
-    <nav className="w-full bg-white shadow-sm">
+    <nav className="w-full bg-white dark:bg-black shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0">
-              <h1 className="text-black font-bold text-xl lg:text-2xl">
+              <h1 className="text-black dark:text-white font-bold text-xl lg:text-2xl">
                 Gothic<span className="text-primary">Trends</span>
               </h1>
             </Link>
@@ -35,7 +37,9 @@ export async function Navbar() {
               <SearchBar />
               {user ? (
                 <>
-                  <Link href="/bag" className="group p-2 flex items-center text-gray-600 hover:text-gray-900">
+                  <Link href="/bag" className="group p-2 flex items-center dark:text-white 
+                   
+                  text-gray-600 hover:text-gray-900">
                     <ShoppingBagIcon className="h-6 w-6" />
                     <span className="ml-2 text-sm font-medium">{total}</span>
                   </Link>
@@ -60,6 +64,7 @@ export async function Navbar() {
           <div className="md:hidden flex items-center">
             <NavbarLinks />
           </div>
+          <ThemeToggle/>
         </div>
       </div>
       <div className="md:hidden border-t border-gray-200 py-2">

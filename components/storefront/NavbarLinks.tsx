@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
+import { ThemeToggle } from "../dashboard/ThemeToggle"
 
 export const navbarLinks = [
   { id: 0, name: "Home", href: "/" },
@@ -41,7 +42,7 @@ export function NavbarLinks() {
               "px-3 py-2 rounded-md text-sm font-medium",
               location === item.href
                 ? "bg-primary text-white"
-                : "text-gray-600 hover:bg-primary hover:text-white"
+                : "text-black dark:text-white hover:bg-primary hover:text-white "
             )}
           >
             {item.name}
@@ -68,7 +69,9 @@ export function NavbarLinks() {
             </Link>
           ))}
         </div>
+       
       )}
+      
     </>
   )
 }
