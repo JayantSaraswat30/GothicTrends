@@ -49,7 +49,7 @@ export default async function Dashboard() {
     <>
       <DashboardStats />
 
-      <div className="grid gap-4 md:gp-8 lg:grid-cols-2 xl:grid-cols-3 mt-10">
+      <div className="grid gap-4 md:gp-8 lg:grid-cols-2 xl:grid-cols-3 mt-10 px-8">
         <Card className="xl:col-span-2">
           <CardHeader>
             <CardTitle>Transactions</CardTitle>

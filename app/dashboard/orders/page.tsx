@@ -46,14 +46,16 @@ export default async function OrdersPage() {
   const orders = await getData()
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Orders</CardTitle>
-        <CardDescription>Manage your store orders</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ClientOrders initialOrders={orders} />
-      </CardContent>
-    </Card>
+    <div className="px-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>Orders</CardTitle>
+          <CardDescription>Manage your store orders</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ClientOrders initialOrders={orders} />
+        </CardContent>
+      </Card>
+    </div>
   )
 }

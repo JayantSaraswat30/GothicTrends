@@ -43,7 +43,7 @@ export default async function BannerRoute() {
   const data = await getData();
   return (
     <>
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-end px-8">
         <Button asChild className="flex gap-x-2">
           <Link href="/dashboard/banner/create">
             <PlusCircle className="h-3.5 w-3.5" />
@@ -51,60 +51,61 @@ export default async function BannerRoute() {
           </Link>
         </Button>
       </div>
-
-      <Card className="mt-5">
-        <CardHeader>
-          <CardTitle>Banners</CardTitle>
-          <CardDescription>Manage your banners</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Image</TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead className="text-end">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {data.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>
-                    <Image
-                      alt="Product Image"
-                      src={item.imageString}
-                      width={64}
-                      height={64}
-                      className="rounded-lg object-cover h-16 w-16"
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">{item.title}</TableCell>
-                  <TableCell className="text-end">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size="icon" variant="ghost">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-
-                        <DropdownMenuItem asChild>
-                          <Link href={`/dashboard/banner/${item.id}/delete`}>
-                            Delete
-                          </Link>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+      <div className="px-8">
+        <Card className="mt-5">
+          <CardHeader>
+            <CardTitle>Banners</CardTitle>
+            <CardDescription>Manage your banners</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Image</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead className="text-end">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+
+              <TableBody>
+                {data.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      <Image
+                        alt="Product Image"
+                        src={item.imageString}
+                        width={64}
+                        height={64}
+                        className="rounded-lg object-cover h-16 w-16"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">{item.title}</TableCell>
+                    <TableCell className="text-end">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="icon" variant="ghost">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+
+                          <DropdownMenuItem asChild>
+                            <Link href={`/dashboard/banner/${item.id}/delete`}>
+                              Delete
+                            </Link>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
     </>
   );
 }

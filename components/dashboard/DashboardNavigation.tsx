@@ -3,7 +3,8 @@
 
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname } from "next/navigation"
+import { ThemeToggle } from "./ThemeToggle";
 
 const links = [
   {
@@ -40,6 +41,7 @@ export function DashboardNavigation() {
         >
           {link.name}
         </Link>
+        
       ))}
     </>
   );
