@@ -66,7 +66,7 @@ export function SearchBar() {
   }
 
   return (
-    <div className="relative" ref={searchRef}>
+    <div className="relative dark:text-black" ref={searchRef}>
       <Input
         type="text"
         placeholder="Search products..."
@@ -95,7 +95,7 @@ export function SearchBar() {
                 className="object-cover mr-2"
               />
               <div>
-                <p className="font-semibold">{product.name}</p>
+                <p className="font-semibold dark:text-black">{product.name}</p>
                 <p className="text-sm text-gray-600">${product.price}</p>
               </div>
             </div>
