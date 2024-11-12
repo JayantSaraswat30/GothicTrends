@@ -80,12 +80,12 @@ export function SearchBar() {
         </div>
       )}
       {results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 bg-white shadow-md mt-1 z-10">
+        <div className="absolute top-full left-0 right-0 bg-white dark:bg-gray-950 shadow-md mt-1 z-10">
           {results.map((product) => (
             <div
               key={product.id}
               onClick={() => handleProductClick(product.id)}
-              className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
+              className="flex items-center p-2 hover:bg-orange-400 cursor-pointer"
             >
               <Image
                 src={product.images[0]}
@@ -95,8 +95,8 @@ export function SearchBar() {
                 className="object-cover mr-2"
               />
               <div>
-                <p className="font-semibold dark:text-black">{product.name}</p>
-                <p className="text-sm text-gray-600">${product.price}</p>
+                <p className="font-semibold text-black dark:text-white">{product.name}</p>
+                <p className="text-sm text-black dark:text-white">${product.price}</p>
               </div>
             </div>
           ))}
