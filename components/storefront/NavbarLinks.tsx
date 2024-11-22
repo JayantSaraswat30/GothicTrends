@@ -13,7 +13,7 @@ export const navbarLinks = [
   { id: 2, name: "Men", href: "/products/men" },
   { id: 3, name: "Women", href: "/products/women" },
   { id: 4, name: "Kids", href: "/products/kids" },
-  { id: 5, name: "Orders", href: "/products/orders" },
+  { id: 5, name: "Orders", href: "/orders" },
 ]
 
 export function NavbarLinks() {
