@@ -30,6 +30,7 @@
     "admin-retro": "file:",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.1.7",
     "lucide-react": "^0.408.0",
     "next": "^14.2.16",
