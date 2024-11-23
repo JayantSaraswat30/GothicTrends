@@ -107,10 +107,13 @@ export default async function OrderHistory() {
                         Size: {item.size.name}
                       </p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Price: {item.product.price}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         Quantity: {item.quantity}
                       </p>
                       <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                        ${(item.product.price).toFixed(2)}
+                        ${(item.product.price*item.quantity).toFixed(2)}
                       </p>
                     </div>
                   </div>
