@@ -86,7 +86,7 @@ export default async function OrderHistory() {
                 </div>
               </div>
               <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                Total: ${(order.amount / 100).toFixed(2)}
+                Total: ${(order.amount/100).toFixed(2)}
               </p>
             </div>
             <div className="p-6">
@@ -110,7 +110,7 @@ export default async function OrderHistory() {
                         Quantity: {item.quantity}
                       </p>
                       <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                        ${(item.product.price / 100).toFixed(2)}
+                        ${(item.product.price).toFixed(2)}
                       </p>
                     </div>
                   </div>
