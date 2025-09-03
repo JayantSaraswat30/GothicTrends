@@ -65,18 +65,10 @@ This ensures a fast, efficient, and visually engaging experience for both custom
 - 🔹 Enhance UX with personalized product recommendations  
 - 🔹 Add new payment methods & subscription plans  
 
----
-
-## 📸 Screenshots  
-
-> *(Add screenshots of your UI here for better showcase)*  
-
----
-
-## ⚡ Getting Started  
 
 ### 🔧 Installation  
 1. Clone the repo:  
    ```bash
    git clone https://github.com/your-username/gothic-trends.git
    cd gothic-trends
+
